@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task History - Completed Tasks</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="storage.js"></script>
+</head>
+
+<body>
+    <header>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <h1 style="margin: 0; flex: 1;">Task History</h1>
+            <a href="about.html" class="btn btn-secondary" style="margin-left: auto; margin-right: 0.5rem;"
+                aria-label="About our team">About Us</a>
+        </div>
+        <nav>
+            <a href="index.html" class="btn btn-primary" aria-label="Go to homepage">Home</a>
+            <a href="dashboard.html" class="btn btn-primary" aria-label="Go back to dashboard">Dashboard</a>
+            <a href="profile.html" class="btn btn-info" aria-label="Go to profile page">Profile</a>
+            <a href="#" id="logout-btn" class="btn btn-danger" aria-label="Logout from your account">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="task-history-section">
+                <h2>Completed Tasks</h2>
+                <p>Here are all your completed tasks.</p>
+
+                <ul class="task-list" id="completedTasksList">
+                    <!-- Loaded via JS -->
+                </ul>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="year"></span> To-Do & Notes Manager. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const user = StorageService.getCurrentUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('year').textContent = new Date().getFullYear();
+
+            document.getElementById('logout-btn').addEventListener('click', function (e) {
+                e.preventDefault();
+                StorageService.logout();
+                window.location.href = 'index.html';
+            });
+
+            const completedTasks = StorageService.getUserItems().filter(i =>
+                i.type === 'task' && i.status === 'completed'
+            ).sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+            const list = document.getElementById('completedTasksList');
+            if (completedTasks.length === 0) {
+                list.innerHTML = '<li class="placeholder">No completed tasks yet. Complete some tasks to see them here!</li>';
+            } else {
+                list.innerHTML = completedTasks.map(task => {
+                    const date = new Date(task.created_at).toLocaleDateString(undefined, {
+                        year: 'numeric', month: 'short', day: 'numeric'
+                    });
+                    return `
+                        <li class="task-item completed-task">
+                            <div class="task-content">
+                                <div class="task-text">
+                                    <span>${escapeHtml(task.content)}</span>
+                                    <span class="task-date">Completed on: ${date}</span>
+                                </div>
+                                <span class="status-badge status-completed">Completed</span>
+                            </div>
+                        </li>
+                    `;
+                }).join('');
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        });
+    </script>
+</body>
+
+</html>

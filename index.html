@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do & Notes Manager - Welcome</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="storage.js"></script>
+</head>
+<body>
+    <header>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <h1 style="margin: 0; flex: 1;">Welcome to To-Do & Notes Manager</h1>
+            <a href="about.html" class="btn btn-secondary" style="margin-left: auto;" aria-label="About our team">About Us</a>
+        </div>
+    </header>
+    
+    <main>
+        <div class="container two-column">
+            <div class="left">
+                <div class="main-content">
+                    <div class="intro">
+                        <h2>Manage Your Tasks & Notes</h2>
+                        <h3>Stay organized and productive</h3>
+                        <p>Our easy-to-use system helps you manage your tasks and notes efficiently. Keep track of what needs to be done, add quick notes, and never miss a deadline again.</p>
+                        <p>Create your personal account, add tasks or notes, mark tasks as completed, edit or delete them, and sync all your data in your browser.</p>
+                    </div>
+                    <div class="buttons" id="auth-buttons">
+                        <!-- Buttons will be injected by JS -->
+                    </div>
+                </div>
+            </div>
+            <div class="right" role="img" aria-label="To-do list illustration">
+                <img src="to-do.jpeg" alt="To-do list illustration showing task management" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>&copy; <span id="year"></span> To-Do & Notes Manager. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('year').textContent = new Date().getFullYear();
+            
+            const user = StorageService.getCurrentUser();
+            const authButtons = document.getElementById('auth-buttons');
+            
+            if (user) {
+                authButtons.innerHTML = `
+                    <a href="dashboard.html" class="btn login" aria-label="Go to dashboard">Go to Dashboard</a>
+                    <a href="#" id="logout-btn" class="btn register" aria-label="Logout">Logout</a>
+                `;
+                document.getElementById('logout-btn').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    StorageService.logout();
+                    window.location.reload();
+                });
+            } else {
+                authButtons.innerHTML = `
+                    <a href="login.html" class="btn login" aria-label="Go to login page">Login</a>
+                    <a href="register.html" class="btn register" aria-label="Go to registration page">Register</a>
+                `;
+            }
+        });
+    </script>
+</body>
+</html>

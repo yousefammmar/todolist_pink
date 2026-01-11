@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Settings</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="storage.js"></script>
+</head>
+
+<body>
+    <header>
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">
+            <h1 style="margin: 0; flex: 1;">Profile Settings</h1>
+            <a href="about.html" class="btn btn-secondary" style="margin-left: auto; margin-right: 0.5rem;"
+                aria-label="About our team">About Us</a>
+        </div>
+        <nav>
+            <a href="index.html" class="btn btn-primary" aria-label="Go to homepage">Home</a>
+            <a href="dashboard.html" class="btn btn-primary" aria-label="Go back to dashboard">Dashboard</a>
+            <a href="task_history.html" class="btn btn-info" aria-label="View task history">Task History</a>
+            <a href="#" id="logout-btn" class="btn btn-danger" aria-label="Logout from your account">Logout</a>
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="profile-section">
+                <h2>Edit Your Profile</h2>
+
+                <div id="success-alert" class="alert alert-success" style="display: none;" role="alert"></div>
+                <div id="error-alert" class="alert alert-danger" style="display: none;" role="alert"></div>
+
+                <!-- Profile Image Section -->
+                <div class="profile-image-section">
+                    <h3>Profile Picture</h3>
+                    <div class="profile-image-container" id="profileImagePreviewContainer">
+                        <!-- Image or placeholder will be here -->
+                    </div>
+                    <form id="image-upload-form" class="image-upload-form">
+                        <input type="file" id="profileImageInput" accept="image/jpeg,image/jpg,image/png,image/gif"
+                            aria-label="Upload profile image">
+                        <button type="submit" class="btn btn-primary" aria-label="Upload profile image">Upload
+                            Image</button>
+                    </form>
+                    <p class="text-muted">Accepted formats: JPEG, PNG, GIF. Maximum size: 5MB</p>
+                </div>
+
+                <!-- Profile Information Section -->
+                <div class="profile-info-section">
+                    <h3>Personal Information</h3>
+                    <form id="profileForm">
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" required aria-required="true"
+                                aria-label="Enter your name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required aria-required="true"
+                                aria-label="Enter your email address">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100"
+                            aria-label="Update profile information">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="year"></span> To-Do & Notes Manager. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const user = StorageService.getCurrentUser();
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            document.getElementById('year').textContent = new Date().getFullYear();
+            document.getElementById('name').value = user.name;
+            document.getElementById('email').value = user.email;
+
+            document.getElementById('logout-btn').addEventListener('click', function (e) {
+                e.preventDefault();
+                StorageService.logout();
+                window.location.href = 'index.html';
+            });
+
+            const renderPreview = () => {
+                const container = document.getElementById('profileImagePreviewContainer');
+                if (user.profile_image) {
+                    container.innerHTML = `<img src="${user.profile_image}" alt="Profile picture" class="profile-image" id="profileImagePreview">`;
+                } else {
+                    container.innerHTML = `<div class="profile-image-placeholder" id="profileImagePreview"><span>No Image</span></div>`;
+                }
+            };
+            renderPreview();
+
+            // Preview & Upload image
+            const imageInput = document.getElementById('profileImageInput');
+            imageInput.addEventListener('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const preview = document.getElementById('profileImagePreview');
+                        if (preview.tagName === 'IMG') {
+                            preview.src = e.target.result;
+                        } else {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            img.alt = 'Profile picture preview';
+                            img.className = 'profile-image';
+                            img.id = 'profileImagePreview';
+                            preview.parentNode.replaceChild(img, preview);
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            document.getElementById('image-upload-form').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const file = imageInput.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const result = StorageService.updateUser({ profile_image: e.target.result });
+                        if (result.success) {
+                            showAlert('success-alert', 'Profile image updated successfully!');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Profile info update
+            document.getElementById('profileForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+                const name = document.getElementById('name').value.trim();
+                const email = document.getElementById('email').value.trim();
+
+                const result = StorageService.updateUser({ name, email });
+                if (result.success) {
+                    showAlert('success-alert', 'Profile updated successfully!');
+                } else {
+                    showAlert('error-alert', result.error);
+                }
+            });
+
+            function showAlert(id, message) {
+                const alert = document.getElementById(id);
+                alert.textContent = message;
+                alert.style.display = 'block';
+                setTimeout(() => alert.style.display = 'none', 3000);
+            }
+        });
+    </script>
+</body>
+
+</html>

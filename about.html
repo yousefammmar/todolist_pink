@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Team Members</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="storage.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>About Our Team</h1>
+        <nav id="main-nav">
+            <!-- Navigation will be injected by JS based on auth status -->
+        </nav>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="about-section">
+                <h2>Meet Our Development Team</h2>
+                <p class="team-intro">We are a team of dedicated developers who built this To-Do & Notes Manager
+                    application.</p>
+
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="team-member-image-container">
+                            <img src="team_images/Yousef.png" alt="Yousef Ammar" class="team-member-image">
+                        </div>
+                        <h3 class="team-member-name"><strong><a href="https://yousefammmar.github.io/yousef"
+                                    target="_blank" style="text-decoration: none; color: inherit;">Yousef
+                                    Ammar</a></strong></h3>
+                        <p class="team-member-bio">
+                            Full Stack Developer and Project Lead. Yousef coordinated the migration to a static
+                            architecture and ensured seamless localStorage integration.
+                        </p>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="team-member-image-container">
+                            <img src="team_images/Tasneem.jpeg" alt="Tasneem Ahmad" class="team-member-image">
+                        </div>
+                        <h3 class="team-member-name"><strong><a href="https://yousefammmar.github.io/Tasneem"
+                                    target="_blank" style="text-decoration: none; color: inherit;">Tasneem
+                                    Ahmad</a></strong></h3>
+                        <p class="team-member-bio">
+                            Frontend Specialist. Tasneem handled the JavaScript functionality, focusing on interactivity
+                            and user experience with React.
+                        </p>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="team-member-image-container">
+                            <img src="team_images/Fatema.jpeg" alt="Fatema" class="team-member-image">
+                        </div>
+                        <h3 class="team-member-name"><strong><a href="https://yousefammmar.github.io/Fatema"
+                                    target="_blank" style="text-decoration: none; color: inherit;">Fatema</a></strong>
+                        </h3>
+                        <p class="team-member-bio">
+                            UI/UX Designer. Fatema crafted the visual identity of the application, ensuring a modern and
+                            intuitive interface for all users.
+                        </p>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="team-member-image-container">
+                            <img src="team_images/Ameen.png" alt="Ameen" class="team-member-image">
+                        </div>
+                        <h3 class="team-member-name"><strong><a href="https://yousefammmar.github.io/Ameen"
+                                    target="_blank" style="text-decoration: none; color: inherit;">Ameen</a></strong>
+                        </h3>
+                        <p class="team-member-bio">
+                            Quality Assurance. Ameen was responsible for testing and verification, ensuring that the
+                            local storage logic is robust and reliable.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; <span id="year"></span> To-Do & Notes Manager. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('year').textContent = new Date().getFullYear();
+            const user = StorageService.getCurrentUser();
+            const nav = document.getElementById('main-nav');
+
+            if (user) {
+                nav.innerHTML = `
+                    <a href="index.html" class="btn btn-primary">Home</a>
+                    <a href="dashboard.html" class="btn btn-primary">Dashboard</a>
+                    <a href="task_history.html" class="btn btn-info">Task History</a>
+                    <a href="profile.html" class="btn btn-warning">Profile</a>
+                    <a href="#" id="logout-btn" class="btn btn-danger">Logout</a>
+                `;
+                document.getElementById('logout-btn').addEventListener('click', function (e) {
+                    e.preventDefault();
+                    StorageService.logout();
+                    window.location.reload();
+                });
+            } else {
+                nav.innerHTML = `
+                    <a href="index.html" class="btn btn-primary">Home</a>
+                    <a href="login.html" class="btn btn-info">Login</a>
+                    <a href="register.html" class="btn btn-warning">Register</a>
+                `;
+            }
+        });
+    </script>
+</body>
+
+</html>
